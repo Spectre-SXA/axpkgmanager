@@ -6,7 +6,7 @@ set -e
 
 # Configuration - Update these for your deployment
 REGISTRY_URL="${AX_REGISTRY_URL:-http://localhost:8080/packages.json}"
-CLI_URL="${AX_CLI_URL:-https://your-domain/cli.js}"
+CLI_URL="${AX_CLI_URL:-https://raw.githubusercontent.com/Spectre-SXA/axpkgmanager/refs/heads/main/cli.js}"
 
 # Installation paths
 INSTALL_DIR="/opt/ax/cli"

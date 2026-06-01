@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Minimal AX package manager implemented in POSIX bash-ish script.
+# Depends only on: curl, tar, sha256sum, mkdir, rm, cat, sed, awk
+
+REGISTRY_URL="${AX_REGISTRY_URL:-http://localhost:8080/packages.json}"
+INSTALL_PREFIX="/opt/ax"
+APPS_DIR="$INSTALL_PREFIX/apps"
+REG_DIR="$INSTALL_PREFIX/registry"
+TMP_DIR="/tmp/ax-install.$$"
+
+ensure_dirs(){
+  mkdir -p "$APPS_DIR"
+  mkdir -p "$REG_DIR"
+}
+
+err(){ echo "ax: $*" >&2; }
+
+cmd_update(){
+  echo "Fetching registry from $REGISTRY_URL..."
+  curl -fsSL "$REGISTRY_URL" -o "$REG_DIR/packages.json" || { err "failed to download registry"; return 1; }
+  echo "Registry saved to $REG_DIR/packages.json"
+}
+
+# find package url and checksum. prints: url checksum version
+find_pkg(){
+  local name="$1"; local want_ver="$2"; local regfile="$REG_DIR/packages.json"
+  if [ ! -f "$regfile" ]; then
+    if ! cmd_update; then return 1; fi
+  fi
+
+  awk -v target="$name" -v want_ver="$want_ver" '
+    BEGIN{RS="\n"; inpkg=0; cur_name=""; latest=""; curver=""; url=""; checksum=""}
+    /"name"[ \t]*:[ \t]*"/ {
+      if (match($0, /"name"[ \t]*:[ \t]*"([^"]+)"/,m)) { cur_name=m[1]; inpkg=1; }
+    }
+    inpkg && /"latest"[ \t]*:[ \t]*"/ { if (match($0, /"latest"[ \t]*:[ \t]*"([^"]+)"/,m)) latest=m[1]; }
+    inpkg && /"version"[ \t]*:[ \t]*"/ { if (match($0, /"version"[ \t]*:[ \t]*"([^"]+)"/,m)) curver=m[1]; }
+    inpkg && /"url"[ \t]*:[ \t]*"/ { if (match($0, /"url"[ \t]*:[ \t]*"([^"]+)"/,m)) url=m[1]; }
+    inpkg && /"checksum"[ \t]*:[ \t]*"/ {
+      if (match($0, /"checksum"[ \t]*:[ \t]*"([^"]+)"/,m)) checksum=m[1];
+      if (cur_name==target) {
+        ver = (want_ver==""?latest:want_ver);
+        if (curver==ver) { print url " " checksum " " curver; exit }
+      }
+    }
+    /\}/ { }
+  ' "$regfile"
+}
+
+cmd_install(){
+  local name="$1"; local ver="${2:-}"; ensure_dirs
+  local info
+  info=$(find_pkg "$name" "$ver") || { err "package not found: $name"; return 1; }
+  read -r url checksum version <<< "$info"
+  if [ -z "$url" ]; then err "no download URL found for $name"; return 1; fi
+
+  mkdir -p "$TMP_DIR"
+  tmpfile="$TMP_DIR/${name}-${version}.axpkg"
+  echo "Downloading $url..."
+  curl -fsSL "$url" -o "$tmpfile" || { err "failed to download package"; rm -rf "$TMP_DIR"; return 1; }
+
+  # verify checksum (registry has form sha256:HEX)
+  expected="${checksum#sha256:}"
+  actual=$(sha256sum "$tmpfile" | awk '{print $1}')
+  if [ "$expected" != "$actual" ]; then
+    err "checksum mismatch: expected $expected, got $actual"
+    rm -rf "$TMP_DIR"
+    return 1
+  fi
+
+  dest="$APPS_DIR/${name}-${version}"
+  mkdir -p "$dest"
+  echo "Extracting to $dest..."
+  tar -xzf "$tmpfile" -C "$dest" || { err "failed to extract package"; rm -rf "$TMP_DIR"; return 1; }
+  echo "Installed $name $version -> $dest"
+  rm -rf "$TMP_DIR"
+}
+
+cmd_list(){
+  ensure_dirs
+  if [ ! -d "$APPS_DIR" ]; then echo "(no packages installed)"; return; fi
+  for d in "$APPS_DIR"/*; do
+    [ -e "$d" ] || continue
+    echo "- $(basename "$d")"
+  done
+}
+
+cmd_remove(){
+  local name="$1"
+  if [ -z "$name" ]; then err "specify package name to remove"; return 1; fi
+  # remove matching directories
+  for d in "$APPS_DIR"/${name}-*; do
+    [ -e "$d" ] || { err "no installed package matches $name"; return 1; }
+    rm -rf "$d" && echo "removed $d"
+  done
+}
+
+cmd_search(){
+  local term="$1"; ensure_dirs
+  if [ ! -f "$REG_DIR/packages.json" ]; then cmd_update || return; fi
+  awk -v t="$term" 'BEGIN{IGNORECASE=1} /"name"[ \t]*:/ { if (match($0, /"name"[ \t]*:[ \t]*"([^"]+)"/,m)) name=m[1]; } /"description"[ \t]*:/ { if (match($0, /"description"[ \t]*:[ \t]*"([^"]+)"/,m)) desc=m[1]; if (index(tolower(name), tolower(t)) || index(tolower(desc), tolower(t))) print name " - " desc }' "$REG_DIR/packages.json"
+}
+
+usage(){
+  cat <<EOF
+AX - minimal package manager
+
+Usage: ax <command> [args]
+Commands:
+  update                 Fetch registry
+  search <term>          Search packages
+  install <name> [ver]   Install package
+  list                   List installed packages
+  remove <name>          Remove installed package(s)
+  help                   Show this help
+
+Environment:
+  AX_REGISTRY_URL        Override registry URL (default: $REGISTRY_URL)
+EOF
+}
+
+main(){
+  cmd=${1:-}
+  shift || true
+  case "$cmd" in
+    update) cmd_update "$@" ;;
+    install) cmd_install "$@" ;;
+    list) cmd_list "$@" ;;
+    remove) cmd_remove "$@" ;;
+    search) cmd_search "$@" ;;
+    help|--help|-h|"") usage ;;
+    *) err "unknown command: $cmd"; usage; exit 2 ;;
+  esac
+}
+
+main "$@"

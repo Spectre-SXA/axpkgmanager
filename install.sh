@@ -1,12 +1,12 @@
 #!/bin/bash
 # AX Package Manager - Installation Script
-# Usage: curl https://tempdomain/install.sh | sudo bash
+# Usage: curl https://your-domain/install.sh | sudo bash
 
 set -e
 
 # Configuration - Update these for your deployment
-REGISTRY_URL="${AX_REGISTRY_URL:-https://raw.githubusercontent.com/Spectre-SXA/axpkgmanager/refs/heads/main/registry-data/packages.json}"
-CLI_URL="${AX_CLI_URL:-https://raw.githubusercontent.com/Spectre-SXA/axpkgmanager/refs/heads/main/cli.js}"
+REGISTRY_URL="${AX_REGISTRY_URL:-http://localhost:8080/packages.json}"
+CLI_URL="${AX_CLI_URL:-https://your-domain/cli.js}"
 
 # Installation paths
 INSTALL_DIR="/opt/ax/cli"
@@ -38,6 +38,29 @@ fi
 
 # Make CLI executable
 chmod +x "$INSTALL_DIR/cli.js"
+
+# Install Node dependencies locally so the CLI can run from the install directory
+if command -v npm &> /dev/null; then
+  echo "📦 Installing Node dependencies into $INSTALL_DIR..."
+  cat > "$INSTALL_DIR/package.json" <<'PKG'
+{
+  "name": "ax-cli-install",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "commander": "*",
+    "tar": "*"
+  }
+}
+PKG
+  if (cd "$INSTALL_DIR" && npm install --production --no-audit --no-fund); then
+    echo "✅ Node dependencies installed."
+  else
+    echo "❌ npm install failed. The CLI may still error if dependencies are missing." >&2
+  fi
+else
+  echo "⚠️  npm not found. Install Node/npm or run: sudo npm install --prefix \"$INSTALL_DIR\" commander tar" >&2
+fi
 
 # Create wrapper script
 cat > "$BIN_PATH" <<'WRAPPER'

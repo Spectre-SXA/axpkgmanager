@@ -5,7 +5,7 @@ A lightweight cross-distro Linux package manager with its own universal package 
 ## One-Command Installation
 
 ```bash
-curl https://tempdomain/install.sh | sudo bash
+curl https://raw.githubusercontent.com/Spectre-SXA/axpkgmanager/refs/heads/main/install.sh | sudo bash
 ```
 
 That's it! You're ready to use `ax`.
@@ -22,9 +22,7 @@ axfetch                   # Run it!
 ## Documentation
 
 - **[QUICKSTART.md](./QUICKSTART.md)** — User quick start guide
-- **[DEPLOYMENT.md](./DEPLOYMENT.md)** — Deploy AX for your users
-- **[FEDORA_INSTALL.md](./FEDORA_INSTALL.md)** — Fedora setup for developers
-- **[AX_Design.md](./AX_Design.md)** — Full system architecture and `.axpkg` specification
+- **[README.md](./README.md)** - Current documentation file.
 
 ---
 

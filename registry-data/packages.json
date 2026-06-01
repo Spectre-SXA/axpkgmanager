@@ -9,7 +9,7 @@
       "versions": [
         {
           "version": "0.1.0",
-          "url": "http://localhost:8080/packages/hello-ax-0.1.0.axpkg",
+          "url": "https://raw.githubusercontent.com/Spectre-SXA/axpkgmanager/refs/heads/main/registry-data/packages/hello-ax-0.1.0.axpkg",
           "checksum": "sha256:bcd8a3e5de85aceb725b75be8e934984ed2bc71da4f089c925eb649840a73c44",
           "architectures": [
             "x86_64"
@@ -19,7 +19,7 @@
         },
         {
           "version": "0.2.0",
-          "url": "http://localhost:8080/packages/hello-ax-0.2.0.axpkg",
+          "url": "https://raw.githubusercontent.com/Spectre-SXA/axpkgmanager/refs/heads/main/registry-data/packages/hello-ax-0.2.0.axpkg",
           "checksum": "sha256:20da164c581103f4e169863225726f1e4b12203a18d7013f08521229df93feb2",
           "architectures": [
             "x86_64"
@@ -36,7 +36,7 @@
       "versions": [
         {
           "version": "0.1.0",
-          "url": "http://localhost:8080/packages/axfetch-0.1.0.axpkg",
+          "url": "https://raw.githubusercontent.com/Spectre-SXA/axpkgmanager/refs/heads/main/registry-data/packages/axfetch-0.1.0.axpkg",
           "checksum": "sha256:b6da87cb7f249a744a9a8ec8f99f81f1551df540b1011f269dcfcd78b993616f",
           "architectures": [
             "x86_64",
@@ -54,7 +54,7 @@
       "versions": [
         {
           "version": "0.1.0",
-          "url": "http://localhost:8080/packages/axbuilder-0.1.0.axpkg",
+          "url": "https://raw.githubusercontent.com/Spectre-SXA/axpkgmanager/refs/heads/main/registry-data/packages/axbuilder-0.1.0.axpkg",
           "checksum": "sha256:653efe69ece62aef7d19f7d85fa449e33cbaaf8c608e3f0e277213cc53b59e69",
           "architectures": [
             "x86_64"
@@ -71,12 +71,30 @@
       "versions": [
         {
           "version": "0.1.0",
-          "url": "http://localhost:8080/packages/axpkg-verify-0.1.0.axpkg",
+          "url": "https://raw.githubusercontent.com/Spectre-SXA/axpkgmanager/refs/heads/main/registry-data/packages/axpkg-verify-0.1.0.axpkg",
           "checksum": "sha256:923eb1748307e1a60296d2d135535becf11ad8f5687940d17a6675aeecd17e6c",
           "architectures": [
             "x86_64"
           ],
           "size": 1108,
+          "published_at": "2026-06-01T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "gti",
+      "description": "A git launcher with an animated ASCII car that shows git operations. CREATED BY @rosw ON GITHUB.",
+      "latest": "0.1.0",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "https://raw.githubusercontent.com/Spectre-SXA/axpkgmanager/refs/heads/main/registry-data/packages/gti-0.1.0.axpkg",
+          "checksum": "sha256:de30bfa81b96143e82480b8936b1d81b8aef106ba1992b47bc7893ca871b11ca",
+          "architectures": [
+            "x86_64",
+            "aarch64"
+          ],
+          "size": 9011,
           "published_at": "2026-06-01T00:00:00Z"
         }
       ]

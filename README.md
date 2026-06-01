@@ -1,6 +1,6 @@
 # AX Package Manager
 
-A lightweight cross-distro Linux package manager with its own universal package format (`.axpkg`). Works on Ubuntu, Fedora, Arch, and any Linux distribution.
+A lightweight cross-distro Linux package manager with its own universal package format (`.axpkg`). Works on Ubuntu, Fedora, Arch, and any Linux distribution that supports symlinks.
 
 ## One-Command Installation
 
@@ -39,47 +39,7 @@ npm run build-sample-package
 ```
 
 This creates an `.axpkg` archive in `registry-data/packages/`.
-
-### Running the Registry Server
-
-The registry server hosts packages for end users.
-
-**Start in foreground:**
-
-```bash
-npm run start-registry
-```
-
-The server listens on `http://localhost:8080` and serves:
-- `/packages.json` — registry metadata
-- `/packages/<name>.axpkg` — package archives
-
-**Run as a background systemd service:**
-
-See [FEDORA_INSTALL.md](./FEDORA_INSTALL.md) for complete systemd setup instructions.
-
-### Deployment
-
-To deploy AX for your users:
-
-1. **Host the installer script:**
-   - Upload `install.sh` to your server
-   - Update the `CLI_URL` in the script to point to your `cli.js`
-   - Users run: `curl https://your-domain/install.sh | sudo bash`
-
-2. **Host the CLI:**
-   - Upload `cli.js` to a web server (e.g., `https://your-domain/cli.js`)
-
-3. **Run the registry server:**
-   - Use `npm run start-registry` to serve packages
-   - Ensure the registry is accessible at the URL you configured in `install.sh`
-
-### Architecture
-
-- **Client:** Users install the lightweight AX CLI via one-liner
-- **Registry:** You host packages and metadata on your server
-- **Packages:** Universal `.axpkg` format works on all Linux distributions
-
+-
 ## System Details
 
 ### Installation Paths
@@ -134,11 +94,11 @@ All commands require `sudo`:
 
 ## Support
 
-See [QUICKSTART.md](./QUICKSTART.md) or [AX_Design.md](./AX_Design.md) for more information.
+Message @spectre.cmd on discord for support!
 
 ### Building Packages
 
-To create a new `.axpkg` package, see [AX_Design.md](./AX_Design.md) for the specification.
+To create a new `.axpkg` package, see [AXPKG_Documentation.md](./AXPKG_Documentation) for the specification.
 
 Example: Build a sample package
 
@@ -148,20 +108,4 @@ npm run build-sample-package
 
 This creates an `.axpkg` archive in `registry-data/packages/`.
 
-### Project Structure
-
-```
-/home/spectre/axpkgmanager/
-├── cli.js                 # AX CLI tool
-├── server.js              # Registry server
-├── install.sh             # One-liner installer for end users
-├── package.json           # npm project metadata
-├── README.md              # This file
-├── QUICKSTART.md          # User quick start guide
-├── AX_Design.md           # System design document
-├── registry-data/         # Registry and packages
-│   ├── packages.json      # Registry metadata snapshot
-│   └── packages/          # .axpkg archives
-└── scripts/
-    └── build-sample-package.js  # Package builder
-```
+For more info on .axpkg files, see [AXPKG_Documentation.md](./AXPKG_Documentation) for their structure and more.

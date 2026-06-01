@@ -17,7 +17,7 @@ const APP_ROOT = path.join(AX_ROOT, 'apps');
 const REGISTRY_ROOT = path.join(AX_ROOT, 'registry');
 const STATE_PATH = path.join(AX_ROOT, 'state.json');
 const GLOBAL_BIN = '/usr/local/bin';
-const DEFAULT_REGISTRY_URL = process.env.AX_REGISTRY_URL || 'http://localhost:8080/packages.json';
+const DEFAULT_REGISTRY_URL = process.env.AX_REGISTRY_URL || 'https://raw.githubusercontent.com/Spectre-SXA/axpkgmanager/refs/heads/main/registry-data/packages.json';
 
 function requireRoot() {
   if (typeof process.getuid === 'function' && process.getuid() !== 0) {

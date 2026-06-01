@@ -83,7 +83,7 @@
     },
     {
       "name": "gti",
-      "description": "A git launcher with an animated ASCII car that shows git operations. CREATED BY @rosw ON GITHUB.",
+      "description": "A git launcher with an animated ASCII car that shows git operations. CREATED BY @rwos ON GITHUB.",
       "latest": "0.1.0",
       "versions": [
         {
